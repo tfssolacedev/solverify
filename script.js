@@ -1,6 +1,11 @@
 const loginBtn = document.getElementById('loginBtn');
 const userDiv = document.getElementById('user');
 const usernameSpan = document.getElementById('username');
+const avatarImg = document.getElementById('avatar');
+
+const mainContainer = document.getElementById('main');
+const callbackContainer = document.getElementById('callback');
+const profileData = document.getElementById('profileData');
 const serverList = document.getElementById('serverList');
 
 // Replace with your actual Discord Client ID
@@ -14,6 +19,9 @@ loginBtn.addEventListener('click', () => {
 });
 
 if (window.location.pathname === '/api/auth/callback') {
+  mainContainer.classList.add('hidden');
+  callbackContainer.classList.remove('hidden');
+
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
   const accessToken = params.get('access_token');
@@ -26,9 +34,17 @@ if (window.location.pathname === '/api/auth/callback') {
     })
     .then(res => res.json())
     .then(userData => {
+      // Display user info
+      profileData.innerHTML = `
+        <p><strong>Username:</strong> ${userData.username}#${userData.discriminator}</p>
+        <p><strong>User ID:</strong> ${userData.id}</p>
+        <p><strong>Email:</strong> ${userData.email || "Not available"}</p>
+        <img src="https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png" width="100" style="border-radius: 50%; margin-top: 10px;" />
+      `;
+
       localStorage.setItem('discordUser', JSON.stringify(userData));
 
-      // Server list with invite links
+      // Server list
       const servers = [
         { name: "SolBot", invite: "https://discord.gg/solbot" },
         { name: "Caught Wiki", invite: "https://discord.gg/caughtwiki" },
@@ -41,15 +57,18 @@ if (window.location.pathname === '/api/auth/callback') {
         li.textContent = `Joining ${server.name}...`;
         serverList.appendChild(li);
 
-        window.open(server.invite, '_blank'); // Opens invite in new tab
+        window.open(server.invite, '_blank');
       });
 
       setTimeout(() => {
         window.location.href = '/';
-      }, 3000); // Wait before redirecting
-
+      }, 3000); // Wait 3 seconds before redirecting
     })
-    .catch(console.error);
+    .catch(err => {
+      console.error('Error fetching user:', err);
+      alert('Failed to fetch user data.');
+      window.location.href = '/';
+    });
   } else {
     alert('Authentication failed.');
     window.location.href = '/';
@@ -57,7 +76,8 @@ if (window.location.pathname === '/api/auth/callback') {
 } else {
   const user = JSON.parse(localStorage.getItem('discordUser'));
   if (user) {
-    usernameSpan.textContent = user.username;
+    usernameSpan.textContent = `${user.username}#${user.discriminator}`;
+    avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     userDiv.classList.remove('hidden');
     loginBtn.style.display = 'none';
   }
