@@ -1,19 +1,18 @@
 const loginBtn = document.getElementById('loginBtn');
 const userDiv = document.getElementById('user');
 const usernameSpan = document.getElementById('username');
-const avatarImg = document.getElementById('avatar');
+const serverList = document.getElementById('serverList');
 
 // Replace with your actual Discord Client ID
 const CLIENT_ID = '1350876059687714888';
 const REDIRECT_URI = encodeURIComponent('https://solbotverify.vercel.app/api/auth/callback');
-const SCOPE = 'identify';
+const SCOPE = 'identify%20email%20guilds.join';
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
 loginBtn.addEventListener('click', () => {
   window.location.href = DISCORD_AUTH_URL;
 });
 
-// On callback page, extract token from URL
 if (window.location.pathname === '/api/auth/callback') {
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
@@ -26,9 +25,29 @@ if (window.location.pathname === '/api/auth/callback') {
       }
     })
     .then(res => res.json())
-    .then(data => {
-      localStorage.setItem('discordUser', JSON.stringify(data));
-      window.location.href = '/';
+    .then(userData => {
+      localStorage.setItem('discordUser', JSON.stringify(userData));
+
+      // Server list with invite links
+      const servers = [
+        { name: "SolBot", invite: "https://discord.gg/solbot" },
+        { name: "Caught Wiki", invite: "https://discord.gg/caughtwiki" },
+        { name: "Support Server", invite: "https://discord.gg/7Hy3hztkJE" }
+      ];
+
+      // Open each invite in a new tab
+      servers.forEach(server => {
+        const li = document.createElement("li");
+        li.textContent = `Joining ${server.name}...`;
+        serverList.appendChild(li);
+
+        window.open(server.invite, '_blank'); // Opens invite in new tab
+      });
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 3000); // Wait before redirecting
+
     })
     .catch(console.error);
   } else {
@@ -39,7 +58,6 @@ if (window.location.pathname === '/api/auth/callback') {
   const user = JSON.parse(localStorage.getItem('discordUser'));
   if (user) {
     usernameSpan.textContent = user.username;
-    avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     userDiv.classList.remove('hidden');
     loginBtn.style.display = 'none';
   }
