@@ -27,6 +27,7 @@ if (window.location.pathname === '/api/auth/callback') {
   const accessToken = params.get('access_token');
 
   if (accessToken) {
+    // Fetch user data
     fetch('https://discord.com/api/users/@me', {
       headers: {
         authorization: `Bearer ${accessToken}`
@@ -43,6 +44,22 @@ if (window.location.pathname === '/api/auth/callback') {
       `;
 
       localStorage.setItem('discordUser', JSON.stringify(userData));
+
+      // NEW: Send token to backend
+      fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('✅ User verified on backend:', data);
+      })
+      .catch(err => {
+        console.error('❌ Failed to verify user:', err);
+      });
 
       // Server list
       const servers = [
