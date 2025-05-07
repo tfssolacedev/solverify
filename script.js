@@ -14,7 +14,7 @@ const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback'
 const SCOPE = 'identify%20guilds';
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
-// Show loading spinner
+// Show loading message
 function showLoading(message = "Redirecting...") {
   if (loadingEl) {
     loadingEl.textContent = message;
@@ -29,9 +29,8 @@ if (loginBtn) {
   });
 }
 
-// Check current path
+// Callback logic
 if (window.location.pathname === '/api/auth/callback') {
-  // Hide main content, show callback UI
   if (mainContainer) mainContainer.style.display = 'none';
   if (callbackContainer) callbackContainer.style.display = 'block';
   showLoading("Authenticating...");
@@ -56,8 +55,6 @@ if (window.location.pathname === '/api/auth/callback') {
     })
     .then(userData => {
       localStorage.setItem('discordUser', JSON.stringify(userData));
-
-      // Send token to backend for verification
       return fetch('/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +81,6 @@ if (window.location.pathname === '/api/auth/callback') {
 
   if (mainContainer) mainContainer.style.display = 'block';
 
-  // Show user info if logged in
   if (user) {
     usernameSpan.textContent = `${user.username}#${user.discriminator}`;
     avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
