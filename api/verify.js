@@ -1,28 +1,20 @@
-export default async function handler(req, res) {
-  try {
-    const { access_token } = req.body;
+app.post('/api/verify', async (req, res) => {
+  const { access_token } = req.body;
 
-    const guildsRes = await fetch('https://discord.com/api/users/@me/guilds', {
-      headers: { authorization: `Bearer ${access_token}` }
+  try {
+    const guildRes = await fetch('https://discord.com/api/users/@me/guilds', {
+      headers: { authorization: `Bearer ${access_token}` },
     });
 
-    const guilds = await guildsRes.json();
+    const guilds = await guildRes.json();
 
-    const adminGuilds = guilds
-      .filter(guild => {
-        const permissions = parseInt(guild.permissions ?? 0);
-        return (permissions & 0x8) === 0x8;
-      })
-      .map(guild => ({
-        ...guild,
-        iconURL: guild.icon
-          ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-          : 'https://cdn.discordapp.com/embed/avatars/1.png'
-      }));
+    // Filter only guilds where user has MANAGE_GUILD permission
+    const adminGuilds = guilds.filter(g =>
+      (g.permissions & 0x20) === 0x20
+    );
 
-    res.status(200).json({ success: true, guilds: adminGuilds });
-  } catch (error) {
-    console.error('Error fetching guilds:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    res.json({ guilds: adminGuilds });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to verify token' });
   }
-}
+});
