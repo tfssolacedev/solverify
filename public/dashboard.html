@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SolBot Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container" id="main">
+    <h1>SolBot Dashboard</h1>
+    <button id="loginBtn">Login with Discord</button>
+  </div>
+  <script>
+    // DOM Elements
+    const loginBtn = document.getElementById('loginBtn');
+
+    // Configuration
+    const CLIENT_ID = '1338188377559666730'; // Replace with your Discord Client ID
+    const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
+    const SCOPE = 'identify%20guilds%20email%20guilds.members.read';
+    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+
+    // Handle Login Click
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.location.href = DISCORD_AUTH_URL;
+      });
+    }
+  </script>
+</body>
+</html>
