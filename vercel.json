@@ -9,11 +9,11 @@
   "routes": [
     {
       "src": "/api/verify",
-      "dest": "/verify.js"
+      "dest": "/api/verify.js"
     },
     {
-      "src": "/api/guilds/([^/]+)",
-      "dest": "/guilds.js"
+      "src": "/api/guilds/(.*)",
+      "dest": "/api/guilds.js"
     },
     {
       "src": "/(.*)",
