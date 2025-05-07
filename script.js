@@ -1,3 +1,4 @@
+// DOM Elements
 const loginBtn = document.getElementById('loginBtn');
 const userDiv = document.getElementById('user');
 const usernameSpan = document.getElementById('username');
@@ -6,84 +7,113 @@ const avatarImg = document.getElementById('avatar');
 const mainContainer = document.getElementById('main');
 const callbackContainer = document.getElementById('callback');
 const serverList = document.getElementById('serverList');
+const loadingEl = document.getElementById('loading');
 
-// Replace with your actual Discord Client ID
+// Configuration
 const CLIENT_ID = '1338188377559666730';
 const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
-const SCOPE = 'identify%20guilds'; // Only necessary scopes
+const SCOPE = 'identify%20guilds';
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
-loginBtn.addEventListener('click', () => {
-  window.location.href = DISCORD_AUTH_URL;
-});
+// Show loading spinner
+function showLoading(message = "Redirecting...") {
+  if (loadingEl) {
+    loadingEl.textContent = message;
+    loadingEl.classList.remove('hidden');
+  }
+}
 
+// Handle Login Click
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    window.location.href = DISCORD_AUTH_URL;
+  });
+}
+
+// Check current path
 if (window.location.pathname === '/api/auth/callback') {
-  mainContainer.style.display = 'none';
-  callbackContainer.style.display = 'block';
+  // Hide main content, show callback UI
+  if (mainContainer) mainContainer.style.display = 'none';
+  if (callbackContainer) callbackContainer.style.display = 'block';
+  showLoading("Authenticating...");
 
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
   const accessToken = params.get('access_token');
 
-  if (accessToken) {
-    fetch('https://discord.com/api/users/@me', {
-      headers: { authorization: `Bearer ${accessToken}` }
-    })
-      .then(res => res.json())
-      .then(userData => {
-        localStorage.setItem('discordUser', JSON.stringify(userData));
-        return fetch('/api/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_token: accessToken })
-        });
-      })
-      .then(res => res.json())
-      .then(data => {
-        localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
-        window.location.href = '/dashboard.html';
-      })
-      .catch(err => {
-        console.error('❌ Auth failed:', err);
-        alert('Authentication failed.');
-        window.location.href = '/';
-      });
-  } else {
+  if (!accessToken) {
     alert('Authentication failed: No token found.');
     window.location.href = '/';
+    return;
   }
-} else {
-  const user = JSON.parse(localStorage.getItem('discordUser'));
 
-  // Show/hide login button based on auth state
+  // Fetch User Info
+  fetch('https://discord.com/api/users/@me', {
+    headers: { authorization: `Bearer ${accessToken}` },
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to fetch user data');
+      return res.json();
+    })
+    .then(userData => {
+      localStorage.setItem('discordUser', JSON.stringify(userData));
+
+      // Send token to backend for verification
+      return fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: accessToken }),
+      }).then(res => {
+        if (!res.ok) throw new Error('Server verification failed');
+        return res.json();
+      });
+    })
+    .then(data => {
+      localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
+      window.location.href = '/dashboard.html';
+    })
+    .catch(err => {
+      console.error('❌ Auth failed:', err);
+      alert('Authentication failed. Please try again.');
+      window.location.href = '/';
+    });
+
+} else {
+  // Main Page Logic
+  const storedUser = localStorage.getItem('discordUser');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  if (mainContainer) mainContainer.style.display = 'block';
+
+  // Show user info if logged in
   if (user) {
     usernameSpan.textContent = `${user.username}#${user.discriminator}`;
     avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     userDiv.classList.remove('hidden');
-    loginBtn.style.display = 'none'; // Hide login button
+    if (loginBtn) loginBtn.style.display = 'none';
   } else {
-    loginBtn.style.display = 'inline-block'; // Show login button
+    if (loginBtn) loginBtn.style.display = 'inline-block';
     userDiv.classList.add('hidden');
   }
 
-  // Always show the main container unless in callback
-  mainContainer.style.display = 'block';
+  // Show guilds (servers) if available
+  if (serverList) {
+    const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
 
-  const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
+    if (!guilds.length) {
+      serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
+      return;
+    }
 
-  if (!guilds.length) {
-    serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
-    return;
+    guilds.forEach(guild => {
+      const card = document.createElement('div');
+      card.className = 'server-card';
+      card.innerHTML = `
+        <h3>${guild.name}</h3>
+        <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
+        <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
+      `;
+      serverList.appendChild(card);
+    });
   }
-
-  guilds.forEach(guild => {
-    const card = document.createElement('div');
-    card.className = 'server-card';
-    card.innerHTML = `
-      <h3>${guild.name}</h3>
-      <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
-      <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
-    `;
-    serverList.appendChild(card);
-  });
 }
