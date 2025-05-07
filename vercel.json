@@ -1,23 +1,5 @@
 {
-  "version": 2,
-  "build": {
-    "staticPath": "./"
-  },
-  "functions": {
-    "maxDuration": 10
-  },
   "routes": [
-    {
-      "src": "/api/verify",
-      "dest": "/api/verify.js"
-    },
-    {
-      "src": "/api/guilds/(.*)",
-      "dest": "/api/guilds.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
