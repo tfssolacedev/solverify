@@ -3,8 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SolBot Verify</title>
-  <link rel="stylesheet" href="/style.css" />
+  <title>SolBot Verification</title>
+
+  <!-- Embedded CSS -->
+  <style>
+    :root {
+      --bg-color: #1a1b1f;
+      --text-color: #ffffff;
+      --primary-color: #5865f2;
+      --card-bg: #232428;
+      --accent-color: #3ba55d;
+      --border-radius: 10px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+    }
+
+    button#loginBtn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button#loginBtn:hover {
+      background-color: #4752c4;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #user {
+      margin-top: 1rem;
+    }
+
+    #avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-top: 1rem;
+      border: 2px solid var(--primary-color);
+    }
+
+    #callback .container {
+      max-width: 500px;
+    }
+
+    #serverList {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    #serverList li {
+      background-color: #2c2d31;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #serverList img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 1rem;
+    }
+
+    #serverList a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    #serverList a:hover {
+      text-decoration: underline;
+    }
+
+    #loading {
+      margin-top: 1rem;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
   <div class="container" id="main">
@@ -18,8 +133,7 @@
 
   <div class="container hidden" id="callback">
     <h1>Verification Complete</h1>
-    <div id="profileData"></div>
-    <p>We are joining you to the servers...</p>
+    <p id="loading">We are joining you to the servers...</p>
     <ul id="serverList"></ul>
   </div>
 
