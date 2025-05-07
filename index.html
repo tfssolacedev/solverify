@@ -9,80 +9,109 @@
   <!-- Favicon -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
-  <!-- Stylesheet (optional but recommended) -->
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="/style.css" />
 
   <!-- Main App Script -->
   <script src="/script.js" defer></script>
 
   <style>
+    /* Minimal Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f4f4f4;
       text-align: center;
-      padding: 50px;
+      padding: 50px 20px;
     }
 
     .container {
       max-width: 400px;
       margin: auto;
-      background: #fff;
-      border-radius: 8px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       padding: 30px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
     }
 
     button#loginBtn {
-      background-color: #7289da;
+      background-color: #7289da; /* Discord brand blue */
       color: white;
       border: none;
       padding: 12px 20px;
       font-size: 16px;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
 
     button#loginBtn:hover {
-      background-color: #5b6eae;
+      background-color: #677bc4;
     }
 
-    .hidden {
-      display: none;
-    }
-
-    .loader {
+    #user {
       margin-top: 20px;
-      font-size: 14px;
-      color: #555;
+    }
+
+    #avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-top: 10px;
+      border: 2px solid #ddd;
     }
 
     .server-card {
       text-align: left;
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      margin-top: 20px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      border: 1px solid #eee;
+    }
+
+    .server-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .server-card img {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
-<body class="fade-in">
+<body>
   <main class="container" id="main" role="main">
     <h1>Welcome to SolBot</h1>
-    <button id="loginBtn" aria-label="Login with Discord">Login with Discord</button>
+    <button id="loginBtn">Login with Discord</button>
 
     <section id="user" class="hidden" aria-live="polite">
       <h2>Welcome, <span id="username"></span>!</h2>
-      <img id="avatar" src="" alt="User Avatar" width="80" style="border-radius:50%; margin-top:10px;" />
+      <img id="avatar" src="" alt="User Avatar" />
+      <ul id="serverList"></ul>
     </section>
-
-    <ul id="serverList"></ul>
   </main>
-
-  <section class="container hidden" id="callback" aria-live="polite">
-    <h1>Verification Complete</h1>
-    <p>We are joining you to the servers...</p>
-  </section>
-
-  <div id="loading" class="hidden loader" role="status">Redirecting...</div>
 </body>
 </html>
