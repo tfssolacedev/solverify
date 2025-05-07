@@ -35,27 +35,33 @@ if (window.location.pathname === '/api/auth/callback') {
       .then((res) => res.json())
       .then((userData) => {
         localStorage.setItem('discordUser', JSON.stringify(userData));
-
-        // Send token + user to backend to verify and get guilds
-        return fetch('/api/verify', {
-          method: 'POST',
+        return fetch('https://discord.com/api/users/@me/guilds', {
           headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ access_token: accessToken, user: userData })
+            authorization: `Bearer ${accessToken}`
+          }
         });
       })
       .then((res) => res.json())
-      .then((data) => {
-        console.log('✅ Verified user and fetched guilds:', data.guilds);
+      .then((guilds) => {
+        // Filter and format guilds
+        const adminGuilds = guilds
+          .filter(guild => {
+            const permissions = parseInt(guild.permissions ?? 0);
+            return (permissions & 0x8) === 0x8; // ADMINISTRATOR bit
+          })
+          .map(guild => ({
+            ...guild,
+            iconURL: guild.icon
+              ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+              : 'https://cdn.discordapp.com/embed/avatars/1.png'
+          }));
 
-        // Save guilds and redirect
-        localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
+        localStorage.setItem('discordGuilds', JSON.stringify(adminGuilds));
         window.location.href = '/dashboard.html';
       })
       .catch((err) => {
-        console.error('❌ Failed to verify user or fetch guilds:', err);
-        alert('Authentication failed. Please try again.');
+        console.error('❌ Failed to fetch user or guilds:', err);
+        alert('Authentication failed.');
         window.location.href = '/';
       });
   } else {
@@ -70,33 +76,25 @@ if (window.location.pathname === '/api/auth/callback') {
     userDiv.classList.remove('hidden');
     loginBtn.style.display = 'none';
 
-    // Show dashboard if already logged in
     mainContainer.classList.remove('hidden');
 
-    // Load guilds from backend
-    fetch('/api/guilds')
-      .then((res) => res.json())
-      .then((guilds) => {
-        if (!guilds || guilds.length === 0) {
-          serverList.innerHTML = '<p>You are not in any servers where the bot is active.</p>';
-          return;
-        }
+    const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
 
-        guilds.forEach((guild) => {
-          const card = document.createElement('div');
-          card.className = 'server-card';
-          card.innerHTML = `
-            <h3>${guild.name}</h3>
-            <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
-            <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
-          `;
-          serverList.appendChild(card);
-        });
-      })
-      .catch((err) => {
-        console.error('Failed to load guilds:', err);
-        serverList.innerHTML = '<p>Failed to load servers.</p>';
-      });
+    if (!guilds.length) {
+      serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
+      return;
+    }
+
+    guilds.forEach((guild) => {
+      const card = document.createElement('div');
+      card.className = 'server-card';
+      card.innerHTML = `
+        <h3>${guild.name}</h3>
+        <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
+        <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
+      `;
+      serverList.appendChild(card);
+    });
   } else {
     mainContainer.classList.add('hidden');
   }
