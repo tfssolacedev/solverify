@@ -5,13 +5,12 @@ const avatarImg = document.getElementById('avatar');
 
 const mainContainer = document.getElementById('main');
 const callbackContainer = document.getElementById('callback');
-const profileData = document.getElementById('profileData');
 const serverList = document.getElementById('serverList');
 
 // Replace with your actual Discord Client ID
 const CLIENT_ID = '1350876059687714888';
 const REDIRECT_URI = encodeURIComponent('https://solbotverify.vercel.app/api/auth/callback');
-const SCOPE = 'identify%20email%20guilds.join';
+const SCOPE = 'identify%20guilds'; // Only necessary scopes
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
 loginBtn.addEventListener('click', () => {
@@ -33,61 +32,34 @@ if (window.location.pathname === '/api/auth/callback') {
         authorization: `Bearer ${accessToken}`
       }
     })
-    .then(res => res.json())
-    .then(userData => {
-      // Display user info
-      profileData.innerHTML = `
-        <p><strong>Username:</strong> ${userData.username}#${userData.discriminator}</p>
-        <p><strong>User ID:</strong> ${userData.id}</p>
-        <p><strong>Email:</strong> ${userData.email || "Not available"}</p>
-        <img src="https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png" width="100" style="border-radius: 50%; margin-top: 10px;" />
-      `;
+      .then((res) => res.json())
+      .then((userData) => {
+        localStorage.setItem('discordUser', JSON.stringify(userData));
 
-      localStorage.setItem('discordUser', JSON.stringify(userData));
-
-      // NEW: Send token to backend
-      fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ access_token: accessToken })
+        // Send token + user to backend to verify and get guilds
+        return fetch('/api/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ access_token: accessToken, user: userData })
+        });
       })
-      .then(res => res.json())
-      .then(data => {
-        console.log('✅ User verified on backend:', data);
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('✅ Verified user and fetched guilds:', data.guilds);
+
+        // Save guilds and redirect
+        localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
+        window.location.href = '/dashboard.html';
       })
-      .catch(err => {
-        console.error('❌ Failed to verify user:', err);
-      });
-
-      // Server list
-      const servers = [
-        { name: "SolBot", invite: "https://discord.gg/solbot" },
-        { name: "Caught Wiki", invite: "https://discord.gg/caughtwiki" },
-        { name: "Support Server", invite: "https://discord.gg/7Hy3hztkJE" }
-      ];
-
-      // Open each invite in a new tab
-      servers.forEach(server => {
-        const li = document.createElement("li");
-        li.textContent = `Joining ${server.name}...`;
-        serverList.appendChild(li);
-
-        window.open(server.invite, '_blank');
-      });
-
-      setTimeout(() => {
+      .catch((err) => {
+        console.error('❌ Failed to verify user or fetch guilds:', err);
+        alert('Authentication failed. Please try again.');
         window.location.href = '/';
-      }, 3000); // Wait 3 seconds before redirecting
-    })
-    .catch(err => {
-      console.error('Error fetching user:', err);
-      alert('Failed to fetch user data.');
-      window.location.href = '/';
-    });
+      });
   } else {
-    alert('Authentication failed.');
+    alert('Authentication failed: No access token found.');
     window.location.href = '/';
   }
 } else {
@@ -97,5 +69,35 @@ if (window.location.pathname === '/api/auth/callback') {
     avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     userDiv.classList.remove('hidden');
     loginBtn.style.display = 'none';
+
+    // Show dashboard if already logged in
+    mainContainer.classList.remove('hidden');
+
+    // Load guilds from backend
+    fetch('/api/guilds')
+      .then((res) => res.json())
+      .then((guilds) => {
+        if (!guilds || guilds.length === 0) {
+          serverList.innerHTML = '<p>You are not in any servers where the bot is active.</p>';
+          return;
+        }
+
+        guilds.forEach((guild) => {
+          const card = document.createElement('div');
+          card.className = 'server-card';
+          card.innerHTML = `
+            <h3>${guild.name}</h3>
+            <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
+            <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
+          `;
+          serverList.appendChild(card);
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to load guilds:', err);
+        serverList.innerHTML = '<p>Failed to load servers.</p>';
+      });
+  } else {
+    mainContainer.classList.add('hidden');
   }
 }
