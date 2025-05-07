@@ -9,35 +9,26 @@
   <!-- Favicon -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
-  <!-- External Stylesheet (optional but recommended) -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- JavaScript Logic -->
-  <script src="/script.js" defer></script>
-
+  <!-- Styles -->
   <style>
-    /* Minimal Reset */
     *, *::before, *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
-      text-align: center;
       padding: 50px 20px;
+      margin: 0;
     }
 
     .container {
       max-width: 400px;
       margin: auto;
-      background: #ffffff;
+      background: #fff;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 30px;
-      transition: all 0.3s ease;
     }
 
     h1 {
@@ -47,14 +38,13 @@
     }
 
     button#loginBtn {
-      background-color: #7289da; /* Discord brand blue */
+      background-color: #7289da;
       color: white;
       border: none;
       padding: 12px 20px;
       font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
     button#loginBtn:hover {
@@ -69,32 +59,8 @@
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      object-fit: cover;
       margin-top: 10px;
       border: 2px solid #ddd;
-    }
-
-    .server-card {
-      text-align: left;
-      margin-top: 20px;
-      padding: 12px;
-      background: #f9f9f9;
-      border-radius: 6px;
-      border: 1px solid #eee;
-    }
-
-    .server-card h3 {
-      font-size: 16px;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    .server-card img {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      margin-right: 10px;
-      vertical-align: middle;
     }
 
     .hidden {
@@ -110,8 +76,10 @@
     <section id="user" class="hidden" aria-live="polite">
       <h2>Welcome, <span id="username"></span>!</h2>
       <img id="avatar" src="" alt="User Avatar" />
-      <ul id="serverList"></ul>
     </section>
   </main>
+
+  <!-- External Script -->
+  <script src="/script.js" defer></script>
 </body>
 </html>
