@@ -1,52 +1,36 @@
-// dashboard.js
-
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('guilds-container');
+  const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
 
-  // Get user & guilds from localStorage
-  const user = JSON.parse(localStorage.getItem('discordUser'));
-  const guilds = JSON.parse(localStorage.getItem('discordGuilds'));
-
-  if (!user || !guilds) {
-    container.innerHTML = '<p class="no-servers">You are not logged in or no servers found.</p>';
+  if (!guilds.length) {
+    container.innerHTML = `<p>You are not an admin in any servers.</p>`;
     return;
   }
 
-  // Filter only guilds where user has Administrator
-  const adminGuilds = guilds.filter(guild => {
-    const permissions = parseInt(guild.permissions ?? 0);
-    return (permissions & 0x8) === 0x8; // Check for ADMINISTRATOR bit
-  });
-
-  if (adminGuilds.length === 0) {
-    container.innerHTML = '<p class="no-servers">You do not have Administrator permissions in any servers.</p>';
-    return;
-  }
-
-  adminGuilds.forEach(guild => {
+  guilds.forEach(guild => {
     const card = document.createElement('div');
     card.className = 'server-card';
-
-    const iconURL = guild.icon
-      ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-      : 'https://cdn.discordapp.com/embed/avatars/1.png';
-
     card.innerHTML = `
-      <div class="server-info">
-        <img src="${iconURL}" alt="Guild Icon" />
-        <div>
-          <h3>${guild.name}</h3>
-          <small>Guild ID: ${guild.id}</small>
-        </div>
-      </div>
-      <button class="config-btn" onclick="openConfig('${guild.id}', '${guild.name}')">Config</button>
+      <h3>${guild.name}</h3>
+      <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
+      <p><strong>Config:</strong> <button class="config-btn" onclick="toggleCommands('${guild.id}')">Disable Commands</button></p>
     `;
-
     container.appendChild(card);
   });
 });
 
-// Placeholder for config button click
-function openConfig(guildId, guildName) {
-  alert(`Opening config for ${guildName} (ID: ${guildId})`);
+function toggleCommands(guildId) {
+  fetch(`/api/guilds/${guildId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ disableCommands: true })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(`Commands disabled for ${guildId}: ${data.success}`);
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to update settings.');
+  });
 }
