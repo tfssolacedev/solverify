@@ -1,60 +1,16 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bot Dashboard</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background-color: #f5f5f5;
-    }
-    h2 {
-      color: #333;
-    }
-    .server-card {
-      background-color: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 15px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .server-info {
-      display: flex;
-      align-items: center;
-    }
-    .server-info img {
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
-      margin-right: 15px;
-    }
-    .config-btn {
-      padding: 10px 16px;
-      background-color: #5865f2;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .config-btn:hover {
-      background-color: #4752c4;
-    }
-    .no-servers {
-      color: #777;
-      font-style: italic;
-    }
-  </style>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+  <div class="container">
+    <h2>Your Servers (Admin Only)</h2>
+    <div id="guilds-container"></div>
+  </div>
 
-  <h2>Your Servers (Admin Only)</h2>
-  <div id="guilds-container"></div>
-
-  <script src="dashboard.js"></script>
+  <script src="/dashboard.js"></script>
 </body>
 </html>
