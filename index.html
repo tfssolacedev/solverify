@@ -115,8 +115,8 @@
     // Configuration
     const CLIENT_ID = '1338188377559666730'; // Replace with your Discord Client ID
     const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
-    const SCOPE = 'identify%20guilds';
-    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
+    const SCOPE = 'identify%20guilds%20email%20guilds.members.read';
+    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
 
     // Show loading spinner
     function showLoading(message = "Redirecting...") {
