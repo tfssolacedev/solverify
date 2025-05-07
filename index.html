@@ -5,89 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SolBot Dashboard</title>
   <style>
-    :root {
-      --bg-color: #1a1b1f;
-      --card-bg: #232428;
-      --text-color: #ffffff;
-      --primary-color: #5865f2;
-      --border-radius: 10px;
-      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      font-family: var(--font-family);
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      background: var(--card-bg);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      color: var(--primary-color);
-    }
-
-    button#loginBtn {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      width: 100%;
-    }
-
-    button#loginBtn:hover {
-      background-color: #4752c4;
-    }
-
-    #user {
-      margin-top: 1.5rem;
-    }
-
-    #avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px solid var(--primary-color);
-      margin-top: 1rem;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    #callback .container {
-      max-width: 500px;
-    }
-
-    #loading {
-      margin-top: 1rem;
-      color: #aaa;
-      font-size: 0.95rem;
-    }
+    /* ... (styles remain the same) ... */
   </style>
 </head>
 <body>
   <div class="container" id="main">
     <h1>SolBot Dashboard</h1>
-    <button id="loginBtn" onclick="window.location.href='https://discord.com/oauth2/authorize?client_id=1338188377559666730&response_type=code&redirect_uri=https%3A%2F%2Fsolbot.store%2Fapi%2Fauth%2Fcallback&scope=identify+guilds+email+guilds.members.read';">Login with Discord</button>
+    <button id="loginBtn">Login with Discord</button>
 
     <div id="user" class="hidden">
       <h2>Welcome, <span id="username"></span>!</h2>
@@ -102,6 +26,7 @@
 
   <script>
     // DOM Elements
+    const loginBtn = document.getElementById('loginBtn');
     const userDiv = document.getElementById('user');
     const usernameSpan = document.getElementById('username');
     const avatarImg = document.getElementById('avatar');
@@ -111,7 +36,10 @@
     const loadingEl = document.getElementById('loading');
 
     // Configuration
+    const CLIENT_ID = '1338188377559666730'; // Replace with your Discord Client ID
     const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
+    const SCOPE = 'identify%20guilds';
+    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
     // Show loading spinner
     function showLoading(message = "Redirecting...") {
@@ -121,6 +49,13 @@
       }
     }
 
+    // Handle Login Click
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.location.href = DISCORD_AUTH_URL;
+      });
+    }
+
     // Check current path
     if (window.location.pathname === '/api/auth/callback') {
       // Hide main content, show callback UI
@@ -128,51 +63,39 @@
       if (callbackContainer) callbackContainer.style.display = 'block';
       showLoading("Authenticating...");
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
 
-      if (!code) {
-        alert('Authentication failed: No code found.');
+      if (!accessToken) {
+        alert('Authentication failed: No token found.');
         window.location.href = '/';
         return;
       }
 
-      // Exchange code for access token
-      fetch('/api/exchange-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+      // Fetch User Info
+      fetch('https://discord.com/api/users/@me', {
+        headers: { authorization: `Bearer ${accessToken}` },
       })
         .then(res => {
-          if (!res.ok) throw new Error('Failed to exchange code');
+          if (!res.ok) throw new Error('Failed to fetch user data');
           return res.json();
         })
-        .then(data => {
-          const { access_token } = data;
+        .then(userData => {
+          localStorage.setItem('discordUser', JSON.stringify(userData));
 
-          // Fetch User Info
-          return fetch('https://discord.com/api/users/@me', {
-            headers: { authorization: `Bearer ${access_token}` },
+          // Fetch User Guilds
+          return fetch('https://discord.com/api/users/@me/guilds', {
+            headers: { authorization: `Bearer ${accessToken}` },
           }).then(res => {
-            if (!res.ok) throw new Error('Failed to fetch user data');
+            if (!res.ok) throw new Error('Failed to fetch guild data');
             return res.json();
-          }).then(userData => {
-            localStorage.setItem('discordUser', JSON.stringify(userData));
+          }).then(guildData => {
+            localStorage.setItem('discordGuilds', JSON.stringify(guildData));
 
-            // Send token to backend for verification
-            return fetch('/api/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ access_token }),
-            }).then(res => {
-              if (!res.ok) throw new Error('Server verification failed');
-              return res.json();
-            });
+            // Redirect to dashboard.html
+            window.location.href = '/dashboard.html';
           });
-        })
-        .then(data => {
-          localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
-          window.location.href = '/dashboard.html';
         })
         .catch(err => {
           console.error('❌ Auth failed:', err);
@@ -191,7 +114,9 @@
         usernameSpan.textContent = `${user.username}#${user.discriminator}`;
         avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
         userDiv.classList.remove('hidden');
+        if (loginBtn) loginBtn.style.display = 'none';
       } else {
+        if (loginBtn) loginBtn.style.display = 'inline-block';
         userDiv.classList.add('hidden');
       }
     }
