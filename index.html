@@ -87,7 +87,7 @@
 <body>
   <div class="container" id="main">
     <h1>SolBot Dashboard</h1>
-    <button id="loginBtn">Login with Discord</button>
+    <button id="loginBtn" onclick="window.location.href='https://discord.com/oauth2/authorize?client_id=1338188377559666730&response_type=code&redirect_uri=https%3A%2F%2Fsolbot.store%2Fapi%2Fauth%2Fcallback&scope=identify+guilds+email+guilds.members.read';">Login with Discord</button>
 
     <div id="user" class="hidden">
       <h2>Welcome, <span id="username"></span>!</h2>
@@ -102,7 +102,6 @@
 
   <script>
     // DOM Elements
-    const loginBtn = document.getElementById('loginBtn');
     const userDiv = document.getElementById('user');
     const usernameSpan = document.getElementById('username');
     const avatarImg = document.getElementById('avatar');
@@ -112,10 +111,7 @@
     const loadingEl = document.getElementById('loading');
 
     // Configuration
-    const CLIENT_ID = '1338188377559666730';
     const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
-    const SCOPE = 'identify%20guilds%20email%20guilds.members.read';
-    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
 
     // Show loading spinner
     function showLoading(message = "Redirecting...") {
@@ -123,13 +119,6 @@
         loadingEl.textContent = message;
         loadingEl.classList.remove('hidden');
       }
-    }
-
-    // Handle Login Click
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        window.location.href = DISCORD_AUTH_URL;
-      });
     }
 
     // Check current path
@@ -202,9 +191,7 @@
         usernameSpan.textContent = `${user.username}#${user.discriminator}`;
         avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
         userDiv.classList.remove('hidden');
-        if (loginBtn) loginBtn.style.display = 'none';
       } else {
-        if (loginBtn) loginBtn.style.display = 'inline-block';
         userDiv.classList.add('hidden');
       }
     }
