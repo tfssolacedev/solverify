@@ -1,8 +1,12 @@
 {
-  "rewrites": [
+  "version": 2,
+  "build": {
+    "staticPath": "./"
+  },
+  "routes": [
     {
-      "source": "/api/auth/callback",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
