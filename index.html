@@ -5,7 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SolBot Dashboard</title>
   <style>
-    /* ... (styles remain the same) ... */
+    :root {
+      --bg-color: #1a1b1f;
+      --card-bg: #232428;
+      --text-color: #ffffff;
+      --primary-color: #5865f2;
+      --border-radius: 10px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+    }
+
+    button#loginBtn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    button#loginBtn:hover {
+      background-color: #4752c4;
+    }
+
+    #user {
+      margin-top: 1.5rem;
+    }
+
+    #avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      margin-top: 1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #callback .container {
+      max-width: 500px;
+    }
+
+    #loading {
+      margin-top: 1rem;
+      color: #aaa;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
