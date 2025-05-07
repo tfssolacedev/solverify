@@ -1,46 +1,35 @@
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: #2c2f33;
-  color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  background: #f9f9f9;
+  padding: 20px;
 }
 
 .container {
-  text-align: center;
-  background: #23272a;
-  padding: 40px;
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
-
-h1 {
-  margin-bottom: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #5865F2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #4e5acc;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .hidden {
   display: none;
 }
 
-#avatar {
-  width: 100px;
-  border-radius: 50%;
+.server-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.config-btn {
+  background-color: #5865F2;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
   margin-top: 10px;
 }
