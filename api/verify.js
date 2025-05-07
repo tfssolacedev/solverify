@@ -1,20 +1,25 @@
-app.post('/api/verify', async (req, res) => {
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   const { access_token } = req.body;
 
   try {
-    const guildRes = await fetch('https://discord.com/api/users/@me/guilds', {
-      headers: { authorization: `Bearer ${access_token}` },
+    // Fetch guilds or verify token via Discord API
+    const discordRes = await fetch("https://discord.com/api/users/@me/guilds", {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
     });
 
-    const guilds = await guildRes.json();
+    if (!discordRes.ok) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
 
-    // Filter only guilds where user has MANAGE_GUILD permission
-    const adminGuilds = guilds.filter(g =>
-      (g.permissions & 0x20) === 0x20
-    );
-
-    res.json({ guilds: adminGuilds });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to verify token' });
+    const guilds = await discordRes.json();
+    return res.status(200).json({ success: true, guilds });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
   }
-});
+}
