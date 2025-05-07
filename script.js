@@ -10,16 +10,17 @@ const serverList = document.getElementById('serverList');
 // Replace with your actual Discord Client ID
 const CLIENT_ID = 'YOUR_CLIENT_ID';
 const REDIRECT_URI = encodeURIComponent('https://solbotverify.vercel.app/api/auth/callback');
-const SCOPE = 'identify%20guilds';
+const SCOPE = 'identify%20guilds'; // Only necessary scopes
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
 
 loginBtn.addEventListener('click', () => {
   window.location.href = DISCORD_AUTH_URL;
 });
 
+// Check if we're on the callback URL
 if (window.location.pathname === '/api/auth/callback') {
-  mainContainer.classList.add('hidden');
-  callbackContainer.classList.remove('hidden');
+  mainContainer.style.display = 'none';
+  callbackContainer.style.display = 'block';
 
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
@@ -54,32 +55,37 @@ if (window.location.pathname === '/api/auth/callback') {
   }
 } else {
   const user = JSON.parse(localStorage.getItem('discordUser'));
+
+  // Show/hide login button based on login status
   if (user) {
     usernameSpan.textContent = `${user.username}#${user.discriminator}`;
     avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     userDiv.classList.remove('hidden');
-    loginBtn.style.display = 'none';
-
-    mainContainer.classList.remove('hidden');
-
-    const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
-
-    if (!guilds.length) {
-      serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
-      return;
-    }
-
-    guilds.forEach(guild => {
-      const card = document.createElement('div');
-      card.className = 'server-card';
-      card.innerHTML = `
-        <h3>${guild.name}</h3>
-        <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
-        <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
-      `;
-      serverList.appendChild(card);
-    });
+    loginBtn.style.display = 'none'; // Hide login button
   } else {
-    mainContainer.classList.add('hidden');
+    loginBtn.style.display = 'inline-block'; // Show login button
+    userDiv.classList.add('hidden');
   }
+
+  // Always show the main container unless in callback
+  mainContainer.style.display = 'block';
+
+  // Load guilds from localStorage (already fetched by verify.js)
+  const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
+
+  if (!guilds.length) {
+    serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
+    return;
+  }
+
+  guilds.forEach(guild => {
+    const card = document.createElement('div');
+    card.className = 'server-card';
+    card.innerHTML = `
+      <h3>${guild.name}</h3>
+      <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
+      <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
+    `;
+    serverList.appendChild(card);
+  });
 }
