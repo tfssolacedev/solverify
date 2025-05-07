@@ -6,7 +6,6 @@ const avatarImg = document.getElementById('avatar');
 
 const mainContainer = document.getElementById('main');
 const callbackContainer = document.getElementById('callback');
-const serverList = document.getElementById('serverList');
 const loadingEl = document.getElementById('loading');
 
 // Configuration
@@ -94,26 +93,5 @@ if (window.location.pathname === '/api/auth/callback') {
   } else {
     if (loginBtn) loginBtn.style.display = 'inline-block';
     userDiv.classList.add('hidden');
-  }
-
-  // Show guilds (servers) if available
-  if (serverList) {
-    const guilds = JSON.parse(localStorage.getItem('discordGuilds')) || [];
-
-    if (!guilds.length) {
-      serverList.innerHTML = '<p>You are not an admin in any servers.</p>';
-      return;
-    }
-
-    guilds.forEach(guild => {
-      const card = document.createElement('div');
-      card.className = 'server-card';
-      card.innerHTML = `
-        <h3>${guild.name}</h3>
-        <img src="${guild.iconURL}" alt="Guild Icon" width="64" />
-        <p><strong>Manage:</strong> <a href="/dashboard/${guild.id}">Go to Settings</a></p>
-      `;
-      serverList.appendChild(card);
-    });
   }
 }
