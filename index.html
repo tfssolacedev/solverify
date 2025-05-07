@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SolBot Verification</title>
+  <title>SolBot Dashboard</title>
 
   <!-- Embedded CSS -->
   <style>
     :root {
       --bg-color: #1a1b1f;
+      --card-bg: #232428;
       --text-color: #ffffff;
       --primary-color: #5865f2;
-      --card-bg: #232428;
       --accent-color: #3ba55d;
       --border-radius: 10px;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,10 +19,11 @@
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
       font-family: var(--font-family);
       background-color: var(--bg-color);
       color: var(--text-color);
@@ -30,6 +31,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px;
     }
 
     .container {
@@ -37,9 +39,9 @@
       padding: 2rem;
       border-radius: var(--border-radius);
       max-width: 400px;
-      width: 90%;
+      width: 100%;
       text-align: center;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
     }
 
     h1 {
@@ -57,26 +59,28 @@
       font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      width: 100%;
+      max-width: 300px;
     }
 
     button#loginBtn:hover {
       background-color: #4752c4;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
     #user {
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
 
     #avatar {
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      margin-top: 1rem;
       border: 2px solid var(--primary-color);
+      margin-top: 1rem;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     #callback .container {
@@ -89,41 +93,22 @@
       margin-top: 1rem;
     }
 
-    #serverList li {
-      background-color: #2c2d31;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    #serverList img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 1rem;
-    }
-
-    #serverList a {
-      color: var(--accent-color);
-      text-decoration: none;
-    }
-
-    #serverList a:hover {
-      text-decoration: underline;
-    }
-
     #loading {
       margin-top: 1rem;
       color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container" id="main">
-    <h1>SolBot Verification</h1>
+    <h1>SolBot Dashboard</h1>
     <button id="loginBtn">Login with Discord</button>
     <div id="user" class="hidden">
       <h2>Welcome, <span id="username"></span>!</h2>
@@ -133,10 +118,10 @@
 
   <div class="container hidden" id="callback">
     <h1>Verification Complete</h1>
-    <p id="loading">We are joining you to the servers...</p>
-    <ul id="serverList"></ul>
+    <p id="loading">Redirecting to dashboard...</p>
   </div>
 
+  <!-- External JavaScript -->
   <script src="/script.js"></script>
 </body>
 </html>
