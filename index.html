@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SolBot Dashboard</title>
-
-  <!-- Embedded CSS -->
   <style>
     :root {
       --bg-color: #1a1b1f;
@@ -16,12 +14,6 @@
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
       font-family: var(--font-family);
       background-color: var(--bg-color);
@@ -30,7 +22,6 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
     }
 
     .container {
@@ -44,7 +35,6 @@
     }
 
     h1 {
-      font-size: 1.8rem;
       margin-bottom: 1.5rem;
       color: var(--primary-color);
     }
@@ -64,149 +54,14 @@
     button#loginBtn:hover {
       background-color: #4752c4;
     }
-
-    #user {
-      margin-top: 1.5rem;
-    }
-
-    #avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px solid var(--primary-color);
-      margin-top: 1rem;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    #callback .container {
-      max-width: 500px;
-    }
-
-    #loading {
-      margin-top: 1rem;
-      color: #aaa;
-      font-size: 0.95rem;
-    }
   </style>
 </head>
 <body>
-  <div class="container" id="main">
+  <div class="container">
     <h1>SolBot Dashboard</h1>
     <button id="loginBtn">Login with Discord</button>
-
-    <div id="user" class="hidden">
-      <h2>Welcome, <span id="username"></span>!</h2>
-      <img id="avatar" src="" alt="Avatar" />
-    </div>
   </div>
 
-  <div class="container hidden" id="callback">
-    <h1>Verification Complete</h1>
-    <p id="loading">Redirecting to dashboard...</p>
-  </div>
-
-  <!-- Embedded JavaScript -->
-  <script>
-    // Configuration
-    const CLIENT_ID = '1338188377559666730';
-    const REDIRECT_URI = encodeURIComponent('https://solbot.store/api/auth/callback');
-    const SCOPE = 'identify%20guilds';
-    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
-
-    // DOM Elements
-    const loginBtn = document.getElementById('loginBtn');
-    const userDiv = document.getElementById('user');
-    const usernameSpan = document.getElementById('username');
-    const avatarImg = document.getElementById('avatar');
-
-    const mainContainer = document.getElementById('main');
-    const callbackContainer = document.getElementById('callback');
-    const loadingEl = document.getElementById('loading');
-
-    // Show loading spinner
-    function showLoading(message = "Redirecting...") {
-      if (loadingEl) {
-        loadingEl.textContent = message;
-        loadingEl.classList.remove('hidden');
-      }
-    }
-
-    // Handle Login Click
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        window.location.href = DISCORD_AUTH_URL;
-      });
-    }
-
-    // Check current path
-    if (window.location.pathname === '/api/auth/callback') {
-      // Hide main content, show callback UI
-      if (mainContainer) mainContainer.style.display = 'none';
-      if (callbackContainer) callbackContainer.style.display = 'block';
-      showLoading("Authenticating...");
-
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const accessToken = params.get('access_token');
-
-      if (!accessToken) {
-        alert('Authentication failed: No token found.');
-        window.location.href = '/';
-        return;
-      }
-
-      // Fetch User Info
-      fetch('https://discord.com/api/users/@me', {
-        headers: { authorization: `Bearer ${accessToken}` },
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch user data');
-          return res.json();
-        })
-        .then(userData => {
-          localStorage.setItem('discordUser', JSON.stringify(userData));
-
-          // Send token to backend for verification
-          return fetch('/api/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ access_token: accessToken }),
-          }).then(res => {
-            if (!res.ok) throw new Error('Server verification failed');
-            return res.json();
-          });
-        })
-        .then(data => {
-          localStorage.setItem('discordGuilds', JSON.stringify(data.guilds));
-          window.location.href = '/dashboard.html';
-        })
-        .catch(err => {
-          console.error('❌ Auth failed:', err);
-          alert('Authentication failed. Please try again.');
-          window.location.href = '/';
-        });
-
-    } else {
-      // Main Page Logic
-      const storedUser = localStorage.getItem('discordUser');
-      const user = storedUser ? JSON.parse(storedUser) : null;
-
-      if (mainContainer) mainContainer.style.display = 'block';
-
-      // Show user info if logged in
-      if (user) {
-        usernameSpan.textContent = `${user.username}#${user.discriminator}`;
-        avatarImg.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-        userDiv.classList.remove('hidden');
-        if (loginBtn) loginBtn.style.display = 'none';
-      } else {
-        if (loginBtn) loginBtn.style.display = 'inline-block';
-        userDiv.classList.add('hidden');
-      }
-    }
-  </script>
+  <script src="/script.js"></script>
 </body>
 </html>
