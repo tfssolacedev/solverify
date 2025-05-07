@@ -22,6 +22,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px;
     }
 
     .container {
@@ -35,6 +36,7 @@
     }
 
     h1 {
+      font-size: 1.8rem;
       margin-bottom: 1.5rem;
       color: var(--primary-color);
     }
@@ -54,12 +56,48 @@
     button#loginBtn:hover {
       background-color: #4752c4;
     }
+
+    #user {
+      margin-top: 1.5rem;
+    }
+
+    #avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      margin-top: 1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #callback .container {
+      max-width: 500px;
+    }
+
+    #loading {
+      margin-top: 1rem;
+      color: #aaa;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="main">
     <h1>SolBot Dashboard</h1>
     <button id="loginBtn">Login with Discord</button>
+
+    <div id="user" class="hidden">
+      <h2>Welcome, <span id="username"></span>!</h2>
+      <img id="avatar" src="" alt="Avatar" />
+    </div>
+  </div>
+
+  <div class="container hidden" id="callback">
+    <h1>Verification Complete</h1>
+    <p id="loading">Redirecting to dashboard...</p>
   </div>
 
   <script src="/script.js"></script>
